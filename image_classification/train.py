@@ -13,8 +13,8 @@ gpu_Num = '0'
 set_GPU(gpu_Num)
 
 # 호출할 전처리 데이터 및 학습 결과 저장할 위치
-dataset_path = '/path/to/Glaucoma_processed_K01.pkl'
-save_path = '/path/to/save/'
+dataset_path = '/$$$'
+save_path = '/$$$/$$$'
 if not os.path.exists(save_path) :
     os.makedirs(save_path)
 
