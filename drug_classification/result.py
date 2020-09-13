@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 # coding: utf-8
+``` Root와 데이터 관련 $$$ Masking ```
 
 import sys
-sys.path = ["/product/src/gruads/anaconda3/envs/clone/lib/python3.7/site-packages"]+sys.path
+sys.path = ["/$$$/$$$"]+sys.path
 #import matplotlib.pyplot as plt
 import os
 import time
@@ -60,7 +61,7 @@ with open(os.path.join(RESULT,f'model_{fold}.json'), 'r') as f:
 model.load_weights(os.path.join(RESULT, fold, weight))
 
 print("==============================================")
-print(f"GruPEP Ver1.0 {dt}")
+print(f"$$$ Ver1.0 {dt}")
 print(f"test : {fold}")
 print("==============================================")
 
