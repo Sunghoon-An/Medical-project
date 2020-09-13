@@ -1,8 +1,10 @@
 #!/usr/bin/env python
 # coding: utf-8
+```보완상 $$$ Masking```
+
 
 import sys
-sys.path = ["/product/src/gruads/anaconda3/envs/clone/lib/python3.7/site-packages"]+sys.path
+sys.path = ["/$$$/$$$"]+sys.path
 import math
 import warnings
 
@@ -20,47 +22,46 @@ from utils.util import *
 
 warnings.filterwarnings("ignore")
 
-# rxinfo = pd.read_csv(os.path.join(DATA,"rx_info.csv"), index_col =0)
-baseinfo = pd.read_csv(os.path.join(DATA,"prescript_info.csv"), index_col =0)
+baseinfo = pd.read_csv(os.path.join(DATA,"$$$.csv"), index_col =0)
 
-baseinfo = baseinfo.assign(date = baseinfo.OrderNum.apply(lambda x : date_parser(x[:8], format_string='%Y%m%d')) )
-baseinfo.PatientBirth = baseinfo.PatientBirth.apply(lambda x : date_parser(x[:7],"%Y-%m"))
+baseinfo = baseinfo.assign(date = baseinfo.Order.apply(lambda x : date_parser(x[:8], format_string='%Y%m%d')) )
+baseinfo.Birth = baseinfo.Birth.apply(lambda x : date_parser(x[:7],"%Y-%m"))
 baseinfo = baseinfo.assign(age = [get_age(b,d) for b, d in zip(baseinfo.date, baseinfo.PatientBirth)])
 
-baseinfo[baseinfo.subject=='A41'].PatientNum.nunique()
+baseinfo[baseinfo.subject=='$$$'].$$$Num.nunique()
 
-tmp = baseinfo[baseinfo.subject=='A41'].groupby('PatientNum')[["PatientHeight","PatientWeight","PatientSex","age"]].max()
+tmp = baseinfo[baseinfo.subject=='$$$'].groupby('$$$Num')[["Height","Weight","Sex","age"]].max()
 
 #  preprocess 
-tmp.loc[tmp.PatientWeight == 0,"PatientWeight"] = None
-tmp.loc[tmp.PatientHeight == 0,"PatientHeight"] = None
-tmp.loc[tmp.PatientHeight>200,"PatientHeight"] =None
-tmp.loc[(tmp.PatientWeight > 400), "PatientWeight"] = tmp.loc[tmp.PatientWeight > 400, "PatientWeight"]/1000
-tmp.loc[tmp.PatientHeight<2.5,"PatientHeight"] = None
+tmp.loc[tmp.Weight == 0,"Weight"] = None
+tmp.loc[tmp.Height == 0,"Height"] = None
+tmp.loc[tmp.Height>200,"Height"] =None
+tmp.loc[(tmp.Weight > 400), "Weight"] = tmp.loc[tmp.Weight > 400, "Weight"]/1000
+tmp.loc[tmp.Height<2.5,"Height"] = None
 
 
-tmp = tmp.assign(angle=[angle((a,b)) for a,b in zip(tmp.PatientHeight, tmp.PatientWeight)])
-tmp.loc[tmp.angle.apply(lambda x : True if x < 55 else False),['PatientHeight','PatientWeight']]= None
+tmp = tmp.assign(angle=[angle((a,b)) for a,b in zip(tmp.Height, tmp.Weight)])
+tmp.loc[tmp.angle.apply(lambda x : True if x < 55 else False),['Height','Weight']]= None
 
-tmp = tmp.assign(angle=[angle((a,b+65)) for a,b in zip(tmp.PatientHeight, tmp.PatientWeight)])
-tmp.loc[tmp.angle.apply(lambda x : True if x > 65 else False),['PatientHeight','PatientWeight']]= None
+tmp = tmp.assign(angle=[angle((a,b+65)) for a,b in zip(tmp.Height, tmp.Weight)])
+tmp.loc[tmp.angle.apply(lambda x : True if x > 65 else False),['Height','Weight']]= None
 
-tmp = tmp.assign(angle=[angle((a,b+15)) for a,b in zip(tmp.PatientHeight, tmp.PatientWeight)])
-tmp.loc[tmp.angle.apply(lambda x : True if x < 55 else False),['PatientHeight','PatientWeight']]= None
+tmp = tmp.assign(angle=[angle((a,b+15)) for a,b in zip(tmp.Height, tmp.Weight)])
+tmp.loc[tmp.angle.apply(lambda x : True if x < 55 else False),['Height','Weight']]= None
 
-dataset = tmp[tmp.PatientWeight.notnull() &tmp.PatientHeight.notnull()]
-dataset.PatientSex = dataset.PatientSex.apply(lambda x : 1 if x=='M' else 0)
+dataset = tmp[tmp.Weight.notnull() &tmp.Height.notnull()]
+dataset.Sex = dataset.Sex.apply(lambda x : 1 if x=='M' else 0)
 
 
 # ## XGBRegressor
 train, test = train_test_split(dataset,test_size =0.1)
 scaler = StandardScaler()
 
-y_train = train.PatientHeight
-x_train = train[['PatientSex', 'age']]
+y_train = train.Height
+x_train = train[['Sex', 'age']]
 
-y_test = test.PatientHeight
-x_test = test[['PatientSex', 'age']]
+y_test = test.Height
+x_test = test[['Sex', 'age']]
 
 ## scale x
 scaler.fit(x_train)
@@ -68,11 +69,11 @@ x_train = scaler.transform(x_train)
 x_test = scaler.transform(x_test)
 
 ## scale y
-patient_info = {"Height" : {"mean" : train.PatientHeight.mean()
-                            ,"std" : train.PatientHeight.std()}
+patient_info = {"Height" : {"mean" : train.Height.mean()
+                            ,"std" : train.Height.std()}
                   }
-y_train = y_train.apply(lambda x : (x - patient_info["Height"]['mean'])/patient_info["Height"]['std'])
-y_test = y_test.apply(lambda x : (x - patient_info["Height"]['mean'])/patient_info["Height"]['std'])
+y_train = y_train.apply(lambda x : (x - $$$_info["Height"]['mean'])/$$$_info["Height"]['std'])
+y_test = y_test.apply(lambda x : (x - $$$_info["Height"]['mean'])/$$$_info["Height"]['std'])
 
 ## model 
 xgb = xgboost.XGBRegressor(max_depth=10,learning_rate=1,n_estimators=100)
@@ -90,10 +91,10 @@ with open(os.path.join(RESULT,"scaler_Height.pkl"),'wb') as f:
 ## XGBRFRegressor
 train, test = train_test_split(dataset,test_size =0.1)
 
-y_train = train.PatientWeight
-x_train = train[['PatientHeight','PatientSex', 'age']]
-y_test = test.PatientWeight
-x_test = test[['PatientHeight','PatientSex', 'age']]
+y_train = train.Weight
+x_train = train[['Height','Sex', 'age']]
+y_test = test.Weight
+x_test = test[['Height','Sex', 'age']]
 
 ## scale x
 scaler = StandardScaler()
@@ -102,10 +103,10 @@ x_train = scaler.transform(x_train)
 x_test = scaler.transform(x_test)
 
 ## scale y
-patient_info["weight"] = {"mean" : train.PatientWeight.mean()
-                         ,"std" : train.PatientWeight.std()}
-y_train = y_train.apply(lambda x : (x - patient_info["weight"]['mean'])/patient_info["weight"]['std'])
-y_test = y_test.apply(lambda x : (x - patient_info["weight"]['mean'])/patient_info["weight"]['std'])
+patient_info["weight"] = {"mean" : train.Weight.mean()
+                         ,"std" : train.Weight.std()}
+y_train = y_train.apply(lambda x : (x - $$$_info["weight"]['mean'])/$$$_info["weight"]['std'])
+y_test = y_test.apply(lambda x : (x - $$$_info["weight"]['mean'])/$$$_info["weight"]['std'])
 
 ## model
 xgb = xgboost.XGBRFRegressor(max_depth=10,learning_rate=1,n_estimators=300)
@@ -121,4 +122,4 @@ with open(os.path.join(RESULT,"scaler_Weight.pkl"),'wb') as f:
     pickle.dump(scaler, f)
 
 with open(os.path.join(RESULT, "patient_info.dict"), 'w') as f:
-    f.write(str(patient_info))
+    f.write(str($$$_info))
