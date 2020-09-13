@@ -2,7 +2,7 @@
 # coding: utf-8
 
 import sys
-sys.path = ["/product/src/gruads/anaconda3/envs/clone/lib/python3.7/site-packages"]+sys.path
+sys.path = ["/$$$/$$$"]+sys.path
 import os
 import time
 import pickle
