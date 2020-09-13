@@ -1,11 +1,12 @@
 #!/usr/bin/env python
 # coding: utf-8
+``` 모든 데이터와 Root는 보완상 $로 표시```
 
 import os
 
 BASE = '.'
-DATA = '/data/gruads/backup/'
-AGGREGATE = '/data/gruads/preprocess/aggregate'
+DATA = '/$$$'
+AGGREGATE = '/$$$/$$$/'
 
 # aggregation normal
 RESULT = os.path.join(BASE,'result')
