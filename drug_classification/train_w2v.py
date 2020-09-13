@@ -3,7 +3,6 @@ import xml.etree.ElementTree as ET
 import pandas as pd
 import numpy as np
 import sys
-sys.path = ["~/anaconda3/envs/clone/lib/python3.7/site-packages"]+sys.path
 
 import gensim
 from gensim.models import Word2Vec
