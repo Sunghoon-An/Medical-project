@@ -1,8 +1,9 @@
 #!/usr/bin/env python
 # coding: utf-8
+``` 모든 데이터 정보 및 root는 보완상 $$$로 Mask```
 
 import sys
-sys.path = ["/product/src/gruads/anaconda3/envs/clone/lib/python3.7/site-packages"]+sys.path
+sys.path = ["$$$/$$$"]+sys.path
 import os
 import time
 import pickle
@@ -33,58 +34,57 @@ print("data loading...")
 df = pd.read_csv(os.path.join(BACKUP,'frame.csv'))
 
 ## load preprocess 
-df.loc[df.Unit == "��","Unit"] = 'A'
-df.loc[df.Unit == "��*","Unit"] = 'B'
-df.loc[df.Unit == "ML*","Unit"] = 'ML'
-df.loc[df.Unit.isnull(),"Unit"] = 'Unknown'
+df.loc[df.$$$ == "��","Unit"] = 'A'
+df.loc[df.$$$ == "��*","Unit"] = 'B'
+df.loc[df.$$$ == "ML*","Unit"] = 'ML'
+df.loc[df.$$$.isnull(),"Unit"] = 'Unknown'
 
-### A41(소아과) 데이터만 사용
-df = df[df.subject == 'A41']
+### $$$데이터만 사용
+df = df[df.subject == '$$$']
 
-## O(외래)환자만
-df = df[df.pres_status.isin(["OA","OO","OI"])]
+## $$$만
+df = df[df.pres_status.isin(["$$$","$$$","$$$"])]
 
-### 환자 나이계산(month 단위)
-df.PatientBirth = df.PatientBirth.apply(lambda x : date_parser(x[:7],"%Y-%m"))
+### 나이계산(month 단위)
+df.$$$ = df.$$$.apply(lambda x : date_parser(x[:7],"%Y-%m"))
 df.date = df.date.apply(lambda x : date_parser(str(x),"%Y%m%d"))
-df = df.assign(age = [get_age(b,d) for b, d in zip(df.date, df.PatientBirth)])
+df = df.assign(age = [get_age(b,d) for b, d in zip(df.date, df.$$$)])
 
-### PrscDrLcsNo 의사번호의 자리수, 앞두자리 변수로 사용
-df = df.assign(carrier = df.PrscDrLcsNo.apply(lambda x : 5 if len(x) == 5 else 6))
-df.PrscDrLcsNo = df.PrscDrLcsNo.apply(lambda x : x[:2])
-df.PrscDrLcsNo = df.PrscDrLcsNo.astype(np.int16)
+### $$$의 자리수, 앞두자리 변수로 사용
+df = df.assign(carrier = df.$$$.apply(lambda x : 5 if len(x) == 5 else 6))
+df.$$$ = df.$$$.apply(lambda x : x[:2])
+df.$$$ = df.$$$.astype(np.int16)
 
-### PatientSex binary
-df.PatientSex = df.PatientSex.apply(lambda x : 1 if x=='M' else 0)
+### Sex binary
+df.Sex = df.Sex.apply(lambda x : 1 if x=='M' else 0)
 
 print("predict missing value (Weight,Height)")
 #### replace outlier to null
-df.loc[df.PatientWeight == 0,"PatientWeight"] = None
-df.loc[df.PatientHeight == 0,"PatientHeight"] = None
+df.loc[df.Weight == 0,"Weight"] = None
+df.loc[df.Height == 0,"Height"] = None
 ## 카거 200이 넘는경우
-df.loc[df.PatientHeight>200,"PatientHeight"] =None
+df.loc[df.Height>200,"Height"] =None
 ## 몸무게 400이 넘는경우 단위가 그램일 가능성이 있어서 1/1000 함
-df.loc[(df.PatientWeight > 400), "PatientWeight"] = df.loc[df.PatientWeight > 400, "PatientWeight"]/1000
+df.loc[(df.Weight > 400), "Weight"] = df.loc[df.Weight > 400, "Weight"]/1000
 ## 키다 2.5보다 작은경우 null
-df.loc[df.PatientHeight<2.5,"PatientWeight"] = None
+df.loc[df.Height<2.5,"Height"] = None
 
 ## 몸무게와 키의 비율이 이상한경우 제거
-df = df.assign(angle=[angle((a,b)) for a,b in zip(df.PatientHeight, df.PatientWeight)])
-df.loc[df.angle.apply(lambda x : True if x < 55 else False),['PatientHeight','PatientWeight']]= None
+df = df.assign(angle=[angle((a,b)) for a,b in zip(df.Height, df.Weight)])
+df.loc[df.angle.apply(lambda x : True if x < 55 else False),['Height','Weight']]= None
 
-df = df.assign(angle=[angle((a,b+65)) for a,b in zip(df.PatientHeight, df.PatientWeight)])
-df.loc[df.angle.apply(lambda x : True if x > 65 else False),['PatientHeight','PatientWeight']]= None
+df = df.assign(angle=[angle((a,b+65)) for a,b in zip(df.Height, df.Weight)])
+df.loc[df.angle.apply(lambda x : True if x > 65 else False),['Height','Weight']]= None
 
-df = df.assign(angle=[angle((a,b+15)) for a,b in zip(df.PatientHeight, df.PatientWeight)])
-df.loc[df.angle.apply(lambda x : True if x < 55 else False),['PatientHeight','PatientWeight']]= None
+df = df.assign(angle=[angle((a,b+15)) for a,b in zip(df.Height, df.Weight)])
+df.loc[df.angle.apply(lambda x : True if x < 55 else False),['Height','Weight']]= None
 
-## 일부 전처리 전에 원본 데이터 셋 따로 저장해둠
 org_test = df.copy()
 
-with open(os.path.join(RESULT, "patient_info.dict"), 'r') as f: 
+with open(os.path.join(RESULT, "info.dict"), 'r') as f: 
     patient_info = eval(f.read())
 
-#### restore Height prediction model (input : "PatientSex","age", model : XGBRegressor)
+#### restore Height prediction model (input : "Sex","age", model : XGBRegressor)
 #### 키가 null인경우 null값을 추정하는 모형 사용
 height_model = xgboost.XGBRegressor(max_depth=10, learning_rate=1, n_estimators=100)
 height_model.load_model(os.path.join(RESULT,"XGBRegressor_Height.model"))
@@ -93,9 +93,9 @@ with open(os.path.join(RESULT,"scaler_Height.pkl"),'rb') as f:
     scaler = pickle.load(f)
 
 #### fill null
-data = scaler.transform(df.loc[df.PatientHeight.isnull(),["PatientSex","age"]])
+data = scaler.transform(df.loc[df.Height.isnull(),["Sex","age"]])
 pred = height_model.predict(data)
-df.loc[df.PatientHeight.isnull(),"PatientHeight"] = (pred*patient_info['Height']['std'])+patient_info['Height']['mean']
+df.loc[df.Height.isnull(),"Height"] = (pred*patient_info['Height']['std'])+patient_info['Height']['mean']
 
 #### restore Weight prediction model (input : "PatientHeight","PatientSex","age", model : XGBRFRegressor)
 #### 몸무게가 null인경우 null값을 추정하는 모형 사용
@@ -106,16 +106,14 @@ with open(os.path.join(RESULT,"scaler_Weight.pkl"),'rb') as f:
     scaler = pickle.load(f)
 
 #### fill null
-data = scaler.transform(df.loc[df.PatientWeight.isnull(),["PatientHeight","PatientSex","age"]])
+data = scaler.transform(df.loc[df.Weight.isnull(),["Height","PatientSex","age"]])
 pred = weight_model.predict(data)
-df.loc[df.PatientWeight.isnull(),"PatientWeight"] = (pred*patient_info['weight']['std'])+patient_info['weight']['mean']
+df.loc[df.Weight.isnull(),"Weight"] = (pred*patient_info['weight']['std'])+patient_info['weight']['mean']
 
-### drop age over 16
-### 소아과 대상이 아닌 만16세 이하 제거
 df = df[df.age <= 192]
 org_test = org_test[org_test.age <= 192]
 
-## labeling 특정조건에 해당하는 경우 사고로 본다
+
 df = labeling(df)
 ### 정상이 아닌 경우 & 사고인 경우 제외하고 제거
 df = df[df.normal.notnull() | (df.label==1)]
@@ -123,9 +121,9 @@ df.label = df.label.fillna(0)
 
 ### label encoder (Dosage, disease_code)
 le = LabelEncoder()
-df['Dosage'] = le.fit_transform(df['Dosage'])
+df['$$$'] = le.fit_transform(df['$$$'])
 
-with open(os.path.join(RESULT,"Dosage_LabelEncoder.pkl"),'wb') as f:
+with open(os.path.join(RESULT,"$$$_LabelEncoder.pkl"),'wb') as f:
     pickle.dump(le, f)
 
 le = LabelEncoder()
@@ -137,7 +135,7 @@ with open(os.path.join(RESULT,"disease_LabelEncoder.pkl"),'wb') as f:
     pickle.dump(le, f)
 
 ## Amount/kg feature
-df = df.assign(amt_per_w = df.Amount / df.PatientWeight)
+df = df.assign(amt_per_w = df.Amount / df.Weight)
 
 ## total Amount feature
 df = df.assign(total_amt = df.Amount * df.Count)
@@ -176,32 +174,32 @@ for train_index, test_index, fold in fold_gen(df_index, 5):
     ## rescale amount by Unit
     dc_max_min = {}
 
-    ## Drugcode별 Amount 대해서 min-max scaling
+    ## Amount 대해서 min-max scaling
     epslion = 1e-07
-    for drugcode in train.Drugcode.unique():
-        tmp = train[train.Drugcode==drugcode]
+    for drugcode in train.$$$.unique():
+        tmp = train[train.$$$==drugcode]
         dc_max_min[drugcode] = (tmp.Amount.max()+epslion, tmp.Amount.min()-epslion)
 
     ## scaling train
-    for drugcode in train.Drugcode.unique():
-        tmp = train.loc[train.Drugcode==drugcode,'Amount']
-        train.loc[train.Drugcode==drugcode,'Amount'] = (tmp - dc_max_min[drugcode][1]) / (dc_max_min[drugcode][0] - dc_max_min[drugcode][1])
+    for drugcode in train.$$$.unique():
+        tmp = train.loc[train.$$$==drugcode,'Amount']
+        train.loc[train.$$$==drugcode,'Amount'] = (tmp - dc_max_min[drugcode][1]) / (dc_max_min[drugcode][0] - dc_max_min[drugcode][1])
 
     ## scaling test
-    for drugcode in test.Drugcode.unique():
-        tmp = test.loc[test.Drugcode==drugcode,'Amount']
+    for drugcode in test.$$$.unique():
+        tmp = test.loc[test.$$$==drugcode,'Amount']
         try:
-            test.loc[test.Drugcode==drugcode,'Amount'] = (tmp - dc_max_min[drugcode][1]) / (dc_max_min[drugcode][0] - dc_max_min[drugcode][1])
+            test.loc[test.$$$==drugcode,'Amount'] = (tmp - dc_max_min[drugcode][1]) / (dc_max_min[drugcode][0] - dc_max_min[drugcode][1])
         except KeyError:
-            tmp = test.loc[test.Drugcode==drugcode,'Amount']
+            tmp = test.loc[test.$$$==drugcode,'Amount']
             print(f"{drugcode} KeyError {tmp.shape[0]}")
-            test.loc[test.Drugcode==drugcode,'Amount'] = 0.5
+            test.loc[test.$$$==drugcode,'Amount'] = 0.5
 
     with open(os.path.join(RESULT, "drugcode_max_min.dict"), "w") as f:
         f.write(str(dc_max_min))
 
     ## drop duplicate row
-    dup_col = ["Amount","Count","Days","PrscDrLcsNo","Dosage","disease_code","age","PatientHeight","PatientWeight","PatientSex","amt_per_w"]
+    dup_col = ["$$$$$$$$$$$$$$$$$$"]
     train.drop_duplicates(subset=dup_col, keep = "first", inplace = True)
 
     #### word2vec 로 약물코드 변환
@@ -211,18 +209,17 @@ for train_index, test_index, fold in fold_gen(df_index, 5):
     train_drug = np.zeros([train.shape[0], FEATURE_SIZE])
     test_drug = np.zeros([test.shape[0], FEATURE_SIZE])
 
-    for i,d in enumerate(pbar(train.Drugcode)):
+    for i,d in enumerate(pbar(train.$$$)):
         train_drug[i] = w2v.wv[d]
 
-    for i,d in enumerate(pbar(test.Drugcode)):
+    for i,d in enumerate(pbar(test.$$$)):
         test_drug[i] = w2v.wv[d]
     
     ## 나머지 컬럼 스케일링
     scaler = StandardScaler()
-    # "Dosage","disease_code",
 
-    COLUMNS = ["Amount","Count","Days","PrscDrLcsNo","Dosage","disease_code"
-               ,"age","PatientHeight","PatientWeight","PatientSex","amt_per_w","total_amt","carrier"
+    COLUMNS = ["$$$","$$$","$$$","$$$","$$$","disease_code"
+               ,"age","Height","Weight","Sex","amt_per_w","total_amt","carrier"
                ,'210112','210109', '210114', '210113', '210115', '210111', '12010101', '210105']
     print('fit scaler')
     scaler.fit(train[COLUMNS])
