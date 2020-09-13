@@ -1,4 +1,5 @@
 # -*- coding: utf-8 -*-
+``` 모든 데이터와 Root는 보완상 $로 표시```
 
 from scripts import dataset
 from scripts.tools import *
